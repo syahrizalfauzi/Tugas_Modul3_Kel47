@@ -14,20 +14,21 @@ export default class Selector extends Component {
   }
 
   componentDidMount() {
-    this.setState({ isFetching: true });
+    this.setState((state) => ({ ...state, isFetching: true }));
     fetch("https://fakestoreapi.com/products/categories")
       .then((res) => res.json())
       .then((json) =>
-        this.setState({
+        this.setState((state) => ({
+          ...state,
           categories: json,
           isFetching: false,
           category: json[0],
-        })
+        }))
       );
   }
 
   handleCategoryButton(event) {
-    this.setState({ category: event.target.name });
+    this.setState((state) => ({ ...state, category: event.target.name }));
   }
 
   render() {

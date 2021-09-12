@@ -7,41 +7,112 @@ export default class Sorter extends Component {
     this.state = {
       sortBy: "title",
       order: "asc",
-      products: [],
+      electronicProducts: [],
+      jeweleryProducts: [],
+      menProducts: [],
+      womenProducts: [],
       isFetching: true,
     };
-
     this.handleChangeOrder = this.handleChangeOrder.bind(this);
     this.handleChangeSort = this.handleChangeSort.bind(this);
+    this.getProductArray = this.getProductArray.bind(this);
+    this.sortProductArrays = this.sortProductArrays.bind(this);
   }
 
   componentDidMount() {
-    fetch(`https://fakestoreapi.com/products/category/${this.props.category}`)
-      .then((res) => res.json())
-      .then((json) => this.setState({ products: json, isFetching: false }));
-  }
+    const fetches = [
+      fetch(`https://fakestoreapi.com/products/category/electronics`)
+        .then((res) => res.json())
+        .then((json) =>
+          this.setState((state) => ({
+            ...state,
+            electronicProducts: json,
+          }))
+        ),
+      fetch(`https://fakestoreapi.com/products/category/jewelery`)
+        .then((res) => res.json())
+        .then((json) =>
+          this.setState((state) => ({
+            ...state,
+            jeweleryProducts: json,
+          }))
+        ),
+      fetch(`https://fakestoreapi.com/products/category/men's%20clothing`)
+        .then((res) => res.json())
+        .then((json) =>
+          this.setState((state) => ({
+            ...state,
+            menProducts: json,
+          }))
+        ),
+      fetch(`https://fakestoreapi.com/products/category/women's%20clothing`)
+        .then((res) => res.json())
+        .then((json) =>
+          this.setState((state) => ({
+            ...state,
+            womenProducts: json,
+          }))
+        ),
+    ];
 
-  componentDidUpdate(prev, next) {
-    console.log("prev", prev);
-    console.log("next", next);
-    if (prev.sortBy === next.sortBy && prev.order === next.order) return;
-
-    const sortedProducts = next.products.sort((a, b) => {
-      if (a[next.sortBy] > b[next.sortBy]) return next.order === "asc" ? -1 : 1;
-      if (a[next.sortBy] < b[next.sortBy]) return next.order === "asc" ? 1 : -1;
-      return 0;
+    Promise.all(fetches).then(() => {
+      this.sortProductArrays();
+      this.setState((state) => ({
+        ...state,
+        isFetching: false,
+      }));
     });
-
-    console.log(sortedProducts);
-    // this.setState({ products: sortedProducts });
   }
 
+  sortProductArrays() {
+    const sorter = (a, b) => {
+      if (a[this.state.sortBy] < b[this.state.sortBy])
+        return this.state.order === "asc" ? -1 : 1;
+      if (a[this.state.sortBy] > b[this.state.sortBy])
+        return this.state.order === "asc" ? 1 : -1;
+      return 0;
+    };
+
+    const electronicProducts = this.state.electronicProducts.sort(sorter);
+    const jeweleryProducts = this.state.jeweleryProducts.sort(sorter);
+    const menProducts = this.state.menProducts.sort(sorter);
+    const womenProducts = this.state.womenProducts.sort(sorter);
+
+    this.setState((state) => ({
+      ...state,
+      electronicProducts,
+      jeweleryProducts,
+      menProducts,
+      womenProducts,
+    }));
+  }
+
+  getProductArray() {
+    switch (this.props.category) {
+      case "electronics":
+        return this.state.electronicProducts;
+      case "jewelery":
+        return this.state.jeweleryProducts;
+      case "men's clothing":
+        return this.state.menProducts;
+      case "women's clothing":
+        return this.state.womenProducts;
+      default:
+        return this.state.electronicProducts;
+    }
+  }
   handleChangeSort(event) {
-    this.setState({ sortBy: event.target.value });
+    this.setState(
+      (state) => ({ ...state, sortBy: event.target.value }),
+      this.sortProductArrays
+    );
   }
 
   handleChangeOrder(event) {
-    this.setState({ order: event.target.value });
+    this.setState(
+      (state) => ({ ...state, order: event.target.value }),
+      this.sortProductArrays
+    );
   }
 
   render() {
@@ -57,8 +128,8 @@ export default class Sorter extends Component {
           <option value="desc">Menurun (DESC)</option>
         </select>
         {this.state.isFetching && <p>Loading...</p>}
-        {this.state.products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {this.getProductArray().map((item) => (
+          <ProductCard key={item.id} product={item} />
         ))}
       </div>
     );
