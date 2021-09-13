@@ -20,6 +20,7 @@ export default class Sorter extends Component {
   }
 
   componentDidMount() {
+    //Array yang berisi Promise fetching ke API
     const fetches = [
       fetch(`https://fakestoreapi.com/products/category/electronics`)
         .then((res) => res.json())
@@ -55,15 +56,20 @@ export default class Sorter extends Component {
         ),
     ];
 
+    //Fetch semua data dari API secara parallel
     Promise.all(fetches).then(() => {
       this.sortProductArrays();
-      this.setState((state) => ({
-        ...state,
-        isFetching: false,
-      }));
+      this.setState((state) => {
+        console.log(state);
+        return {
+          ...state,
+          isFetching: false,
+        };
+      });
     });
   }
 
+  //Fungsi untuk mengurutkan produk, dipanggil tiap dropdown pengurut diubah
   sortProductArrays() {
     const sorter = (a, b) => {
       if (a[this.state.sortBy] < b[this.state.sortBy])
@@ -87,6 +93,7 @@ export default class Sorter extends Component {
     }));
   }
 
+  //Fungsi untuk mengambil jenis produk yang ditampilkan
   getProductArray() {
     switch (this.props.category) {
       case "electronics":
@@ -101,6 +108,7 @@ export default class Sorter extends Component {
         return this.state.electronicProducts;
     }
   }
+
   handleChangeSort(event) {
     this.setState(
       (state) => ({ ...state, sortBy: event.target.value }),
