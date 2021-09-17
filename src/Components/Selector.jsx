@@ -1,60 +1,37 @@
-import React, { Component } from "react";
-import Sorter from "./Sorter";
+import { useContext } from "react";
+import { FetchingContext, ProductContext } from "../App";
+import Sorter from "./SorterClass";
 
-export default class Selector extends Component {
-  constructor(props) {
-    super(props);
-    this.handleCategoryButton = this.handleCategoryButton.bind(this);
+export default function Selector() {
+  const isFetching = useContext(FetchingContext);
+  const [productState, productDispatch] = useContext(ProductContext);
 
-    this.state = {
-      categories: [],
-      isFetching: true,
-      category: undefined,
-    };
+  function handleCategoryButton(event) {
+    productDispatch({ type: "changeCategory", payload: event.target.name });
   }
 
-  componentDidMount() {
-    this.setState((state) => ({ ...state, isFetching: true }));
-    fetch("https://fakestoreapi.com/products/categories")
-      .then((res) => res.json())
-      .then((json) =>
-        this.setState((state) => ({
-          ...state,
-          categories: json,
-          isFetching: false,
-          category: json[0],
-        }))
-      );
-  }
-
-  handleCategoryButton(event) {
-    this.setState((state) => ({ ...state, category: event.target.name }));
-  }
-
-  render() {
-    return (
+  return (
+    <div>
       <div>
-        <div>
-          <p>Pilih kategori produk : </p>
-          {this.state.isFetching ? (
-            <b>Loading...</b>
-          ) : (
-            <ul>
-              {this.state.categories.map((category, index) => (
-                <button
-                  key={index}
-                  name={category}
-                  onClick={this.handleCategoryButton}
-                >
-                  {category}
-                </button>
-              ))}
-            </ul>
-          )}
-          {!this.state.isFetching && <p>{this.state.category} terpilih</p>}
-        </div>
-        <Sorter category={this.state.category} />
+        <p>Pilih kategori produk : </p>
+        {isFetching ? (
+          <b>Loading...</b>
+        ) : (
+          <ul>
+            {productState.categories.map((category, index) => (
+              <button
+                key={index}
+                name={category}
+                onClick={handleCategoryButton}
+              >
+                {category}
+              </button>
+            ))}
+          </ul>
+        )}
+        {!isFetching && <p>{productState.category} terpilih</p>}
       </div>
-    );
-  }
+      <Sorter category={productState.category} />
+    </div>
+  );
 }
