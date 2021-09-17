@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Sorter from "./Sorter";
+import "./Selector.css";
 
 export default class Selector extends Component {
   constructor(props) {

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import './ProductCard.css';
 
 export default class ProductCard extends Component {
   constructor(props) {
@@ -22,8 +23,8 @@ export default class ProductCard extends Component {
           src={this.props.product.image}
           alt={this.props.product.title}
           style={{
-            height: 64,
-            width: 64,
+            height: 256,
+            width: 256,
           }}
         />
         <h3>{this.props.product.title}</h3>

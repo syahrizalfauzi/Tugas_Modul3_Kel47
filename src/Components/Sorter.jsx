@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import ProductCard from "./ProductCard";
+import "./Sorter.css";
 
 export default class Sorter extends Component {
   constructor(props) {
